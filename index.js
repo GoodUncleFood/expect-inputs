@@ -21,7 +21,7 @@ var expectType = function(input, isType, debug) {
 
   if (isType !== 'object' && isType !== 'array' && isType !== 'function' && isType !== 'string' && isType !== 'number' && isType !== 'boolean') {
     if (debug) {
-      console.log('invalid type', isType, 'passed to isType');
+      console.log('invalid option', isType, 'passed to isType');
     }
     return false;
   }
@@ -57,6 +57,14 @@ var expectType = function(input, isType, debug) {
 var expectLength = function(input, hasLength, minLength, maxLength, debug) {
 
   if (hasLength !== undefined) {
+
+    if (typeof(hasLength) !== 'boolean' && (typeof(hasLength) !== 'number' || (typeof(hasLength) === 'number' && hasLength < 0))) {
+      if (debug) {
+        console.log('invalid option', hasLength, 'passed to hasLength');
+      }
+      return false;
+    }
+
     if (typeof(hasLength) === 'number' && input.length !== hasLength) {
       return false;
     } else if (typeof(hasLength) === 'boolean' && input.length > 1 !== hasLength) {
@@ -64,12 +72,34 @@ var expectLength = function(input, hasLength, minLength, maxLength, debug) {
     }
   }
 
-  if (minLength !== undefined && input.length < minLength) {
-    return false;
+  if (minLength !== undefined) {
+
+    if (typeof(minLength) !== 'number' || (typeof(minLength) === 'number' && minLength < 0)) {
+      if (debug) {
+        console.log('invalid option', minLength, 'passed to minLength');
+      }
+      return false;
+    }
+
+    if (input.length < minLength) {
+      return false;
+    }
+
   }
 
-  if (maxLength !== undefined && input.length > maxLength) {
-    return false;
+  if (maxLength !== undefined) {
+
+    if (typeof(maxLength) !== 'number' || (typeof(maxLength) === 'number' && maxLength < 0)) {
+      if (debug) {
+        console.log('invalid option', maxLength, 'passed to maxLength');
+      }
+      return false;
+    }
+
+    if (input.length > maxLength) {
+      return false;
+    }
+
   }
 
   return true;
@@ -425,6 +455,7 @@ console.log(expectInputs(testItem, {
         isType: 'array',
         hasLength: 2,
         hasAllOf: [2, 1],
+        maxLength: -1,
         isExactly: testItem.thing.nextThing.nextNextThing.a,
       },
       'testItem.thing.nextThing.theOtherOne.a': {
