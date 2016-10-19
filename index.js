@@ -13,7 +13,9 @@
   hasNoneOf: [], checks if key is present if test item is an object
   hasNoneOf: [], checks if key is present if test item is an object
   isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
-  hasNested: { path (string) : expects (obj) }
+  hasNested: { path (string) : expects options (obj) }
+  atIndex: { path (string) : expects options (obj) }
+  forEach: { path (string) : expects options (obj) }
   customFunction: () => {} expects if function returns true
 
 */
@@ -376,7 +378,7 @@ var checkNested = function(input, hasNested, debug) {
       var expectedPathResult = expectPath(input, path);
       if (expectedPathResult === false) {
         result = false;
-      } if (!expectInputs(expectedPathResult, hasNested[key], debug)) {
+      } if (!checkInputs(expectedPathResult, hasNested[key], debug)) {
         result =  false;
       }
 
@@ -433,7 +435,7 @@ var expectPath = function(base, path, debug) {
 
 };
 
-var expectInputs = function(input, expects, debug) {
+var checkInputs = function(input, expects, debug) {
 
   if (expects.isType !== undefined && !expectType(input, expects.isType, debug)) {
     if (debug) {
@@ -540,6 +542,46 @@ var expectInputs = function(input, expects, debug) {
   return true;
 
 };
+
+var expectInputs = function(input, expects, debug) {
+
+  var result = true;
+
+  if (Array.isArray(input)) {
+    if (Array.isArray(expects)) {
+      input.forEach(function(item, index) {
+        if (result) {
+          if (!expectInputs(item, expects[index], debug)) {
+            result = false;
+          }
+        }
+      });
+    }
+  } else {
+    if (!checkInputs(input, expects, debug)) {
+      result = false;
+    }
+  }
+
+  return result;
+
+};
+
+
+// console.log(expectInputs(
+//   [
+//     1,
+//     2,
+//     3,
+//   ],
+//   [
+//     {isType: 'number'},
+//     {isType: 'number'},
+//     {isType: 'number'},
+//   ],
+//   true
+// ));
+
 
 var testItem = {
   thing: {
