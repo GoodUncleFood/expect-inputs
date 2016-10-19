@@ -12,6 +12,7 @@
   hasAnyOf: [], checks if key is present if test item is an object
   hasNoneOf: [], checks if key is present if test item is an object
   hasNoneOf: [], checks if key is present if test item is an object
+  isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
   hasNested: { path (string) : expects (obj) }
   cb: () => {} expects if cb returns true
 
@@ -274,6 +275,29 @@ var expectAllOf = function(input, hasAllOf, debug) {
 
 };
 
+var expectArrayOfType = function(input, isArrayOfType, debug) {
+
+  if (isArrayOfType !== 'object' && isArrayOfType !== 'array' && isArrayOfType !== 'function' && isArrayOfType !== 'string' && isArrayOfType !== 'number' && isArrayOfType !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isArrayOfType, 'passed to isArrayOfType');
+    }
+    return false;
+  }
+
+  var result = true;
+
+  input.forEach(function(item) {
+    if (result) {
+      if (typeof(item) !== isArrayOfType) {
+        result = false;
+      }
+    }
+  });
+
+  return result;
+
+};
+
 var checkNested = function(input, hasNested, debug) {
 
   var result = true;
@@ -416,6 +440,12 @@ var expectInputs = function(input, expects, debug) {
     }
     return false;
   }
+  if (expects.isArrayOfType !== undefined && !expectArrayOfType(input, expects.isArrayOfType, debug)) {
+    if (debug) {
+      console.log('isArrayOfType check failed');
+    }
+    return false;
+  }
 
   if (expects.cb !== undefined && !expects.cb(input, debug)) {
     if (debug) {
@@ -439,7 +469,7 @@ var testItem = {
   thing: {
     nextThing: {
       nextNextThing: {
-        a: [1, 2],
+        a: [false, false],
       },
       theOtherOne: {
         a: 'hello',
@@ -454,8 +484,9 @@ console.log(expectInputs(testItem, {
       'testItem.thing.nextThing.nextNextThing.a': {
         isType: 'array',
         hasLength: 2,
-        hasAllOf: [2, 1],
-        maxLength: -1,
+        hasAllOf: [false],
+        maxLength: 10,
+        isArrayOfType: 'boolean',
         isExactly: testItem.thing.nextThing.nextNextThing.a,
       },
       'testItem.thing.nextThing.theOtherOne.a': {
