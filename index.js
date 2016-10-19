@@ -1,21 +1,30 @@
 /*
 
-  isType : 'object', 'array', 'function, ''string', 'number', 'boolean'
-  hasLength : true, false
+  isType : 'object', 'array', 'function, 'string', 'number', 'boolean'
+  hasLength : true, false, number
   minLength : number > 0
   maxLength : number > 0
+  isExactly: Object, Array, Function, String, Number, Boolean
   isNull : true, false
   isUndefined : true, false
   isTruthy : true, false
   isFalsy: true, false
-  allowed: []
-  disallowed: [], expects if key is present if input is an object
+  hasAnyOf: [], checks if key is present if test item is an object
+  hasNoneOf: [], checks if key is present if test item is an object
+  hasNoneOf: [], checks if key is present if test item is an object
   hasNested: { path (string) : expects (obj) }
   cb: () => {} expects if cb returns true
 
 */
 
-var expectType = function(input, isType) {
+var expectType = function(input, isType, debug) {
+
+  if (isType !== 'object' && isType !== 'array' && isType !== 'function' && isType !== 'string' && isType !== 'number' && isType !== 'boolean') {
+    if (debug) {
+      console.log('invalid type', isType, 'passed to isType');
+    }
+    return false;
+  }
 
   if (isType === 'object' && (typeof(input) !== 'object' || Array.isArray(input))) {
     return false;
@@ -45,10 +54,14 @@ var expectType = function(input, isType) {
 
 };
 
-var expectLength = function(input, hasLength, minLength, maxLength) {
+var expectLength = function(input, hasLength, minLength, maxLength, debug) {
 
-  if (hasLength !== undefined && input.length > 1 !== hasLength) {
-    return false;
+  if (hasLength !== undefined) {
+    if (typeof(hasLength) === 'number' && input.length !== hasLength) {
+      return false;
+    } else if (typeof(hasLength) === 'boolean' && input.length > 1 !== hasLength) {
+      return false;
+    }
   }
 
   if (minLength !== undefined && input.length < minLength) {
@@ -63,7 +76,17 @@ var expectLength = function(input, hasLength, minLength, maxLength) {
 
 };
 
-var expectNull = function(input, isNull) {
+var expectExactly = function(input, isExactly, debug) {
+
+  if (input === isExactly) {
+    return true;
+  } else {
+    return false;
+  }
+
+};
+
+var expectNull = function(input, isNull, debug) {
 
   if (isNull && input !== null) {
     return false;
@@ -77,7 +100,7 @@ var expectNull = function(input, isNull) {
 
 };
 
-var expectUndefined = function(input, isUndefined) {
+var expectUndefined = function(input, isUndefined, debug) {
 
   if (isUndefined && input !== undefined) {
     return false;
@@ -91,7 +114,7 @@ var expectUndefined = function(input, isUndefined) {
 
 };
 
-var expectTruthy = function(input, isTruthy) {
+var expectTruthy = function(input, isTruthy, debug) {
 
   if (isTruthy && !input) {
     return false;
@@ -105,7 +128,7 @@ var expectTruthy = function(input, isTruthy) {
 
 };
 
-var expectFalsy = function(input, isFalsy) {
+var expectFalsy = function(input, isFalsy, debug) {
 
   if (isFalsy && input) {
     return false;
@@ -119,14 +142,14 @@ var expectFalsy = function(input, isFalsy) {
 
 };
 
-var expectAllowed = function(input, allowed) {
+var expectAnyOf = function(input, hasAnyOf, debug) {
 
   var result = true;
 
   if (Array.isArray(input)) {
     input.forEach(function(item) {
       if (result) {
-        if (allowed.indexOf(item) < 0) {
+        if (hasAnyOf.indexOf(item) < 0) {
           result = false;
         }
       }
@@ -137,14 +160,14 @@ var expectAllowed = function(input, allowed) {
 
     keys.forEach(function(key) {
       if (result) {
-        if (allowed.indexOf(key) < 0) {
+        if (hasAnyOf.indexOf(key) < 0) {
           result = false;
         }
       }
     });
 
   } else {
-    if (allowed.indexOf(input) < 0) {
+    if (hasAnyOf.indexOf(input) < 0) {
       return false;
     }
   }
@@ -153,14 +176,14 @@ var expectAllowed = function(input, allowed) {
 
 };
 
-var expectDisallowed = function(input, disallowed) {
+var expectNoneOf = function(input, hasNoneOf, debug) {
 
   var result = true;
 
   if (Array.isArray(input)) {
     input.forEach(function(item) {
       if (result) {
-        if (disallowed.indexOf(item) > -1) {
+        if (hasNoneOf.indexOf(item) > -1) {
           result = false;
         }
       }
@@ -171,14 +194,14 @@ var expectDisallowed = function(input, disallowed) {
 
     keys.forEach(function(key) {
       if (result) {
-        if (disallowed.indexOf(key) > -1) {
+        if (hasNoneOf.indexOf(key) > -1) {
           result = false;
         }
       }
     });
 
   } else {
-    if (disallowed.indexOf(input) > -1) {
+    if (hasNoneOf.indexOf(input) > -1) {
       return false;
     }
   }
@@ -187,7 +210,41 @@ var expectDisallowed = function(input, disallowed) {
 
 };
 
-var checkNested = function(input, hasNested) {
+var expectAllOf = function(input, hasAllOf, debug) {
+
+  var result = true;
+
+  if (Array.isArray(input)) {
+    hasAllOf.forEach(function(item) {
+      if (result) {
+        if (input.indexOf(item) < 0) {
+          result = false;
+        }
+      }
+    });
+  } else if (typeof(input) === 'object' && !Array.isArray(input)) {
+
+    var keys = Object.keys(input);
+
+    hasAllOf.forEach(function(item) {
+      if (result) {
+        if (keys.indexOf(item) < 0) {
+          result = false;
+        }
+      }
+    });
+
+  } else {
+    if (hasAllOf.indexOf(input) < 0) {
+      return false;
+    }
+  }
+
+  return result;
+
+};
+
+var checkNested = function(input, hasNested, debug) {
 
   var result = true;
   var keys = Object.keys(hasNested);
@@ -195,12 +252,12 @@ var checkNested = function(input, hasNested) {
   keys.forEach(function(key) {
     if (result) {
 
-      var path = filterPath(input, key);
+      var path = filterPath(input, key, debug);
 
       var expectedPathResult = expectPath(input, path);
       if (expectedPathResult === false) {
         result = false;
-      } if (!expectInputs(expectedPathResult, hasNested[key])) {
+      } if (!expectInputs(expectedPathResult, hasNested[key], debug)) {
         result =  false;
       }
 
@@ -212,7 +269,7 @@ var checkNested = function(input, hasNested) {
 
 };
 
-var filterPath = function(base, path) {
+var filterPath = function(base, path, debug) {
 
   var filteredPath;
   var components = path.split('.');
@@ -233,7 +290,7 @@ var filterPath = function(base, path) {
 
 };
 
-var expectPath = function(base, path) {
+var expectPath = function(base, path, debug) {
 
   var result = true;
   var current = base;
@@ -260,43 +317,87 @@ var expectPath = function(base, path) {
 
 var expectInputs = function(input, expects, debug) {
 
-  if (expects.isType !== undefined && !expectType(input, expects.isType)) {
+  if (expects.isType !== undefined && !expectType(input, expects.isType, debug)) {
+    if (debug) {
+      console.log('type check failed');
+    }
     return false;
   }
 
-  if ((expects.hasLength !== undefined || expects.minLength !== undefined || expects.maxLength !== undefined) && !expectLength(input, expects.hasLength, expects.minLength, expects.maxLength)) {
+  if ((expects.hasLength !== undefined || expects.minLength !== undefined || expects.maxLength !== undefined) && !expectLength(input, expects.hasLength, expects.minLength, expects.maxLength, debug)) {
+    if (debug) {
+      console.log('length check failed');
+    }
     return false;
   }
 
-  if (expects.isNull !== undefined && !expectNull(input, expects.isNull)) {
+  if (expects.isExactly !== undefined && !expectExactly(input, expects.isExactly, debug)) {
+    if (debug) {
+      console.log('isExactly check failed');
+    }
     return false;
   }
 
-  if (expects.isUndefined !== undefined && !expectUndefined(input, expects.isUndefined)) {
+  if (expects.isNull !== undefined && !expectNull(input, expects.isNull, debug)) {
+    if (debug) {
+      console.log('isNull check failed');
+    }
     return false;
   }
 
-  if (expects.isTruthy !== undefined && !expectTruthy(input, expects.isTruthy)) {
+  if (expects.isUndefined !== undefined && !expectUndefined(input, expects.isUndefined, debug)) {
+    if (debug) {
+      console.log('isUndefined check failed');
+    }
     return false;
   }
 
-  if (expects.isFalsy !== undefined && !expectFalsy(input, expects.isFalsy)) {
+  if (expects.isTruthy !== undefined && !expectTruthy(input, expects.isTruthy, debug)) {
+    if (debug) {
+      console.log('isTruthy check failed');
+    }
     return false;
   }
 
-  if (expects.allowed !== undefined && !expectAllowed(input, expects.allowed)) {
+  if (expects.isFalsy !== undefined && !expectFalsy(input, expects.isFalsy, debug)) {
+    if (debug) {
+      console.log('isFalsy check failed');
+    }
     return false;
   }
 
-  if (expects.disallowed !== undefined && !expectDisallowed(input, expects.disallowed)) {
+  if (expects.hasAnyOf !== undefined && !expectAnyOf(input, expects.hasAnyOf, debug)) {
+    if (debug) {
+      console.log('hasAnyOf check failed');
+    }
     return false;
   }
 
-  if (expects.cb !== undefined && !expects.cb(input)) {
+  if (expects.hasNoneOf !== undefined && !expectNoneOf(input, expects.hasNoneOf, debug)) {
+    if (debug) {
+      console.log('hasNoneOf check failed');
+    }
     return false;
   }
 
-  if (expects.hasNested !== undefined && !checkNested(input, expects.hasNested)) {
+  if (expects.hasAllOf !== undefined && !expectAllOf(input, expects.hasAllOf, debug)) {
+    if (debug) {
+      console.log('hasAllOf check failed');
+    }
+    return false;
+  }
+
+  if (expects.cb !== undefined && !expects.cb(input, debug)) {
+    if (debug) {
+      console.log('callback failed');
+    }
+    return false;
+  }
+
+  if (expects.hasNested !== undefined && !checkNested(input, expects.hasNested, debug)) {
+    if (debug) {
+      console.log('check of nested object failed');
+    }
     return false;
   }
 
@@ -307,7 +408,12 @@ var expectInputs = function(input, expects, debug) {
 var testItem = {
   thing: {
     nextThing: {
-      a: true,
+      nextNextThing: {
+        a: [1, 2],
+      },
+      theOtherOne: {
+        a: 'hello',
+      }
     },
   },
 };
@@ -315,9 +421,20 @@ var testItem = {
 console.log(expectInputs(testItem, {
     isType: 'object',
     hasNested: {
-      'testItem.thing.nextThing.a': {
+      'testItem.thing.nextThing.nextNextThing.a': {
+        isType: 'array',
+        hasLength: 2,
+        hasAllOf: [2, 1],
+        isExactly: testItem.thing.nextThing.nextNextThing.a,
+      },
+      'testItem.thing.nextThing.theOtherOne.a': {
         isType: 'string',
+        hasAnyOf: ['hello'],
+        hasNoneOf: ['bad'],
+        hasAllOf: ['hello'],
+        isExactly: 'hello',
       },
     },
-  }
+  },
+  true
 ));
