@@ -10,6 +10,7 @@
   isFalsy: true, false
   allowed: []
   disallowed: [], expects if key is present if input is an object
+  hasNested: { path (string) : expects (obj) }
   cb: () => {} expects if cb returns true
 
 */
@@ -186,51 +187,78 @@ var expectDisallowed = function(input, disallowed) {
 
 };
 
-var checkNested = function(input, expectsNested) {
-
-  var keys = Object.keys(expectsNested);
+var checkNested = function(input, hasNested) {
 
   var result = true;
+  var keys = Object.keys(hasNested);
 
   keys.forEach(function(key) {
     if (result) {
 
-      if (!expectPath(input, key)) {
+      var path = filterPath(input, key);
+
+      var expectedPathResult = expectPath(input, path);
+      if (expectedPathResult === false) {
         result = false;
-        return;
+      } if (!expectInputs(expectedPathResult, hasNested[key])) {
+        result =  false;
       }
 
-      if (true) {
-        return;
-      }
 
     }
   });
 
   return result;
+
+};
+
+var filterPath = function(base, path) {
+
+  var filteredPath;
+  var components = path.split('.');
+  var componentsString = components[0];
+
+  components.forEach(function(component, index) {
+    if (filteredPath === undefined) {
+      if (eval(componentsString) === base) {
+        var componentsForFilteredString = components.slice(index + 1);
+        filteredPath = componentsForFilteredString.join('.');
+      } else if (components[index + 1] !== undefined) {
+        componentsString = componentsString + '.' + components[index + 1];
+      }
+    }
+  });
+
+  return filteredPath;
 
 };
 
 var expectPath = function(base, path) {
 
+  var result = true;
   var current = base;
   var components = path.split('.');
-  var result = true;
 
-  components.forEach(function(component) {
+  components.forEach(function(component, index) {
     if (result) {
-      if ((typeof(current) !== 'object') || (!current.hasOwnProperty(components[i]))) {
+
+      if ((typeof(current) !== 'object') || (!current.hasOwnProperty(component))) {
         result = false;
       }
-      current = current[components[i]];
+
+      current = current[component];
     }
   });
 
-  return result;
+  if (result === false) {
+    return result;
+  } else {
+    return current;
+  }
 
 };
 
-var expectInputs = function(input, expects, expectsNested) {
+var expectInputs = function(input, expects, debug) {
 
   if (expects.isType !== undefined && !expectType(input, expects.isType)) {
     return false;
@@ -268,7 +296,7 @@ var expectInputs = function(input, expects, expectsNested) {
     return false;
   }
 
-  if (expectsNested !== undefined && !checkNested(input, expectsNested)) {
+  if (expects.hasNested !== undefined && !checkNested(input, expects.hasNested)) {
     return false;
   }
 
@@ -276,4 +304,20 @@ var expectInputs = function(input, expects, expectsNested) {
 
 };
 
-console.log(expectInputs([1, 2, 3], {cb: function(input) { return input.length > 2; }, }));
+var testItem = {
+  thing: {
+    nextThing: {
+      a: true,
+    },
+  },
+};
+
+console.log(expectInputs(testItem, {
+    isType: 'object',
+    hasNested: {
+      'testItem.thing.nextThing.a': {
+        isType: 'string',
+      },
+    },
+  }
+));
