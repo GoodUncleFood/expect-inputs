@@ -14,7 +14,7 @@
   hasNoneOf: [], checks if key is present if test item is an object
   isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
   hasNested: { path (string) : expects (obj) }
-  cb: () => {} expects if cb returns true
+  customFunction: () => {} expects if function returns true
 
 */
 
@@ -71,6 +71,7 @@ var expectLength = function(input, hasLength, minLength, maxLength, debug) {
     } else if (typeof(hasLength) === 'boolean' && input.length > 1 !== hasLength) {
       return false;
     }
+
   }
 
   if (minLength !== undefined) {
@@ -109,6 +110,13 @@ var expectLength = function(input, hasLength, minLength, maxLength, debug) {
 
 var expectExactly = function(input, isExactly, debug) {
 
+  if (typeof(isExactly) !== 'object' && typeof(isExactly) !== 'function' && typeof(isExactly) !== 'string' && typeof(isExactly) !== 'number' && typeof(isExactly) !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isExactly, 'passed to isExactly');
+    }
+    return false;
+  }
+
   if (input === isExactly) {
     return true;
   } else {
@@ -118,6 +126,13 @@ var expectExactly = function(input, isExactly, debug) {
 };
 
 var expectNull = function(input, isNull, debug) {
+
+  if (typeof(isNull) !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isNull, 'passed to isNull');
+    }
+    return false;
+  }
 
   if (isNull && input !== null) {
     return false;
@@ -133,6 +148,13 @@ var expectNull = function(input, isNull, debug) {
 
 var expectUndefined = function(input, isUndefined, debug) {
 
+  if (typeof(isUndefined) !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isUndefined, 'passed to isUndefined');
+    }
+    return false;
+  }
+
   if (isUndefined && input !== undefined) {
     return false;
   }
@@ -146,6 +168,13 @@ var expectUndefined = function(input, isUndefined, debug) {
 };
 
 var expectTruthy = function(input, isTruthy, debug) {
+
+  if (typeof(isTruthy) !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isTruthy, 'passed to isTruthy');
+    }
+    return false;
+  }
 
   if (isTruthy && !input) {
     return false;
@@ -161,6 +190,13 @@ var expectTruthy = function(input, isTruthy, debug) {
 
 var expectFalsy = function(input, isFalsy, debug) {
 
+  if (typeof(isFalsy) !== 'boolean') {
+    if (debug) {
+      console.log('invalid option', isFalsy, 'passed to isFalsy');
+    }
+    return false;
+  }
+
   if (isFalsy && input) {
     return false;
   }
@@ -174,6 +210,13 @@ var expectFalsy = function(input, isFalsy, debug) {
 };
 
 var expectAnyOf = function(input, hasAnyOf, debug) {
+
+  if (!Array.isArray(hasAnyOf)) {
+    if (debug) {
+      console.log('invalid option', hasAnyOf, 'passed to hasAnyOf');
+    }
+    return false;
+  }
 
   var result = true;
 
@@ -197,10 +240,8 @@ var expectAnyOf = function(input, hasAnyOf, debug) {
       }
     });
 
-  } else {
-    if (hasAnyOf.indexOf(input) < 0) {
-      return false;
-    }
+  } else if (hasAnyOf.indexOf(input) < 0) {
+    return false;
   }
 
   return result;
@@ -208,6 +249,13 @@ var expectAnyOf = function(input, hasAnyOf, debug) {
 };
 
 var expectNoneOf = function(input, hasNoneOf, debug) {
+
+  if (!Array.isArray(hasNoneOf)) {
+    if (debug) {
+      console.log('invalid option', hasNoneOf, 'passed to hasNoneOf');
+    }
+    return false;
+  }
 
   var result = true;
 
@@ -231,10 +279,8 @@ var expectNoneOf = function(input, hasNoneOf, debug) {
       }
     });
 
-  } else {
-    if (hasNoneOf.indexOf(input) > -1) {
-      return false;
-    }
+  } else if (hasNoneOf.indexOf(input) > -1) {
+    return false;
   }
 
   return result;
@@ -242,6 +288,13 @@ var expectNoneOf = function(input, hasNoneOf, debug) {
 };
 
 var expectAllOf = function(input, hasAllOf, debug) {
+
+  if (!Array.isArray(hasAllOf)) {
+    if (debug) {
+      console.log('invalid option', hasAllOf, 'passed to hasAllOf');
+    }
+    return false;
+  }
 
   var result = true;
 
@@ -265,10 +318,8 @@ var expectAllOf = function(input, hasAllOf, debug) {
       }
     });
 
-  } else {
-    if (hasAllOf.indexOf(input) < 0) {
-      return false;
-    }
+  } else if (hasAllOf.indexOf(input) < 0) {
+    return false;
   }
 
   return result;
@@ -300,6 +351,20 @@ var expectArrayOfType = function(input, isArrayOfType, debug) {
 
 var checkNested = function(input, hasNested, debug) {
 
+  if (typeof(input) !== 'object') {
+    if (debug) {
+      console.log('invalid option', input, 'passed to hasNested');
+    }
+    return false;
+  }
+
+  if (typeof(hasNested) !== 'object') {
+    if (debug) {
+      console.log('invalid option', hasNested, 'passed to hasNested');
+    }
+    return false;
+  }
+
   var result = true;
   var keys = Object.keys(hasNested);
 
@@ -314,7 +379,6 @@ var checkNested = function(input, hasNested, debug) {
       } if (!expectInputs(expectedPathResult, hasNested[key], debug)) {
         result =  false;
       }
-
 
     }
   });
@@ -447,11 +511,23 @@ var expectInputs = function(input, expects, debug) {
     return false;
   }
 
-  if (expects.cb !== undefined && !expects.cb(input, debug)) {
-    if (debug) {
-      console.log('callback failed');
+  if (expects.customFunction !== undefined) {
+
+    if (typeof(expects.customFunction) !== 'function') {
+      if (debug) {
+        console.log('custom function failed');
+        console.log('invalid option', expects.customFunction, 'passed to customFunction');
+      }
+      return false;
     }
-    return false;
+
+    if (!expects.customFunction(input)) {
+      if (debug) {
+        console.log('custom function failed');
+      }
+      return false;
+    }
+
   }
 
   if (expects.hasNested !== undefined && !checkNested(input, expects.hasNested, debug)) {
@@ -478,7 +554,8 @@ var testItem = {
   },
 };
 
-console.log(expectInputs(testItem, {
+console.log(expectInputs(testItem,
+  {
     isType: 'object',
     hasNested: {
       'testItem.thing.nextThing.nextNextThing.a': {
@@ -487,6 +564,8 @@ console.log(expectInputs(testItem, {
         hasAllOf: [false],
         maxLength: 10,
         isArrayOfType: 'boolean',
+        isNull: false,
+        customFunction: (i) => i.length > 1,
         isExactly: testItem.thing.nextThing.nextNextThing.a,
       },
       'testItem.thing.nextThing.theOtherOne.a': {
