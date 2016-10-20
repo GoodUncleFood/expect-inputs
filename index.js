@@ -14,8 +14,8 @@
   hasNoneOf: [], checks if key is present if test item is an object
   isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
   hasNested: { path (string) : expects options (obj) }
-  atIndex: { path (string) : expects options (obj) }
   forEach: { path (string) : expects options (obj) }
+  atIndex: { path (string) : expects options (obj) }
   customFunction: () => {} expects if function returns true
 
 */
@@ -548,6 +548,7 @@ var expectInputs = function(input, expects, debug) {
   var result = true;
 
   if (Array.isArray(input)) {
+
     if (Array.isArray(expects)) {
       input.forEach(function(item, index) {
         if (result) {
@@ -556,7 +557,34 @@ var expectInputs = function(input, expects, debug) {
           }
         }
       });
+    } else if (!checkInputs(input, expects, debug)) {
+      result = false;
     }
+
+    if (result && expects.forEach) {
+      input.forEach(function(item) {
+        if (result) {
+          if (!checkInputs(item, expects.forEach, debug)) {
+            result = false;
+          }
+        }
+      });
+    }
+
+    if (result && expects.atIndex) {
+
+      var keys = Object.keys(expects.atIndex);
+
+      keys.forEach(function(key) {
+        if (result) {
+          if (!checkInputs(input[key], expects.atIndex[key], debug)) {
+            result = false;
+          }
+        }
+      });
+
+    }
+
   } else {
     if (!checkInputs(input, expects, debug)) {
       result = false;
@@ -567,6 +595,26 @@ var expectInputs = function(input, expects, debug) {
 
 };
 
+// console.log(expectInputs(
+//   [
+//     '1',
+//     '2',
+//     3,
+//     false,
+//   ],
+//   {
+//     forEach: {
+//       isNull: false,
+//     },
+//     atIndex: {
+//       0: {isType: 'string'},
+//       1: {isType: 'string'},
+//       2: {isType: 'number'},
+//       3: {isType: 'boolean'},
+//     }
+//   },
+//   true
+// ));
 
 // console.log(expectInputs(
 //   [
@@ -583,41 +631,41 @@ var expectInputs = function(input, expects, debug) {
 // ));
 
 
-var testItem = {
-  thing: {
-    nextThing: {
-      nextNextThing: {
-        a: [false, false],
-      },
-      theOtherOne: {
-        a: 'hello',
-      }
-    },
-  },
-};
-
-console.log(expectInputs(testItem,
-  {
-    isType: 'object',
-    hasNested: {
-      'testItem.thing.nextThing.nextNextThing.a': {
-        isType: 'array',
-        hasLength: 2,
-        hasAllOf: [false],
-        maxLength: 10,
-        isArrayOfType: 'boolean',
-        isNull: false,
-        customFunction: (i) => i.length > 1,
-        isExactly: testItem.thing.nextThing.nextNextThing.a,
-      },
-      'testItem.thing.nextThing.theOtherOne.a': {
-        isType: 'string',
-        hasAnyOf: ['hello'],
-        hasNoneOf: ['bad'],
-        hasAllOf: ['hello'],
-        isExactly: 'hello',
-      },
-    },
-  },
-  true
-));
+// var testItem = {
+//   thing: {
+//     nextThing: {
+//       nextNextThing: {
+//         a: [false, false],
+//       },
+//       theOtherOne: {
+//         a: 'hello',
+//       }
+//     },
+//   },
+// };
+//
+// console.log(expectInputs(testItem,
+//   {
+//     isType: 'object',
+//     hasNested: {
+//       'testItem.thing.nextThing.nextNextThing.a': {
+//         isType: 'array',
+//         hasLength: 2,
+//         hasAllOf: [false],
+//         maxLength: 10,
+//         isArrayOfType: 'boolean',
+//         isNull: false,
+//         customFunction: (i) => i.length > 1,
+//         isExactly: testItem.thing.nextThing.nextNextThing.a,
+//       },
+//       'testItem.thing.nextThing.theOtherOne.a': {
+//         isType: 'string',
+//         hasAnyOf: ['hello'],
+//         hasNoneOf: ['bad'],
+//         hasAllOf: ['hello'],
+//         isExactly: 'hello',
+//       },
+//     },
+//   },
+//   true
+// ));
