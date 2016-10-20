@@ -202,7 +202,7 @@ var checkInputs = function(input, expects, debug) {
 
 };
 
-var expectInputs = function(input, expects, debug) {
+module.exports = expectInputs = function(input, expects, debug) {
 
   var result = true;
 
