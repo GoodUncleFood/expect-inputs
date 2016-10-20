@@ -1,0 +1,20 @@
+{
+  "name": "expect-inputs",
+  "version": "0.0.1",
+  "description": "A helper library to sanity check function inputs.",
+  "author": "Donald Steinert <steinert.donald@gmail.com> (https://dnld.cc)",
+  "license": "MIT",
+  "main": "index.js",
+  "engines": {
+    "node": ">=4.0.0",
+    "npm": ">2.0.0"
+  },
+  "homepage": "https://github.com/GoodUncleFood/expect-inputs",
+  "bugs": {
+    "url": "https://github.com/GoodUncleFood/expect-inputs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoodUncleFood/expect-inputs.git"
+  }
+}
