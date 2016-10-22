@@ -6,6 +6,7 @@ var expectUndefined = require('./lib/expectUndefined');
 var expectTruthy = require('./lib/expectTruthy');
 var expectFalsy = require('./lib/expectFalsy');
 var expectWithinRange = require('./lib/expectWithinRange');
+var expectWithinNonInclusiveRange = require('./lib/expectWithinNonInclusiveRange');
 var expectAnyOf = require('./lib/expectAnyOf');
 var expectNoneOf = require('./lib/expectNoneOf');
 var expectAllOf = require('./lib/expectAllOf');
@@ -153,6 +154,13 @@ var checkInputs = function(input, expects, debug) {
     return false;
   }
 
+  if (expects.isWithinNonInclusiveRange !== undefined && !expectWithinNonInclusiveRange(input, expects.isWithinNonInclusiveRange, debug)) {
+    if (debug) {
+      console.log('isWithinNonInclusiveRange check failed');
+    }
+    return false;
+  }
+
   if (expects.hasAnyOf !== undefined && !expectAnyOf(input, expects.hasAnyOf, debug)) {
     if (debug) {
       console.log('hasAnyOf check failed');
@@ -262,5 +270,3 @@ module.exports = expectInputs = function(input, expects, debug) {
   return result;
 
 };
-
-console.log(expectInputs(5, {isWithinRange: [6, 61]}, true));
