@@ -10,6 +10,7 @@ isNull : true, false
 isUndefined : true, false
 isTruthy : true, false
 isFalsy: true, false
+isWithinRange: [ min Number, max Number ]
 hasAnyOf: [], checks if key is present if test item is an object
 hasNoneOf: [], checks if key is present if test item is an object
 hasNoneOf: [], checks if key is present if test item is an object
