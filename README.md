@@ -14,10 +14,11 @@ isWithinRange: [ min Number, max Number ]
 isWithinNonInclusiveRange: [ min Number, max Number ]
 hasAnyOf: [], checks if key is present if test item is an object
 hasNoneOf: [], checks if key is present if test item is an object
-hasNoneOf: [], checks if key is present if test item is an object
+hasAllOf: [], checks if key is present if test item is an object
+hasOnly: [], checks if key is present if test item is an object
 isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
-hasNested: { path (string) : expects options (obj) }
 forEach: { path (string) : expects options (obj) }
 atIndex: { path (string) : expects options (obj) }
+hasNested: { path (string) : expects options (obj) }
 customFunction: () => {} expects if function returns true
 ```

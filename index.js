@@ -34,7 +34,7 @@ var checkNested = function(input, hasNested, debug) {
   keys.forEach(function(key) {
     if (result) {
 
-      var path = filterPath(input, key, debug);
+      var path = key.split('.').slice(1).join('.');
 
       var expectedPathResult = expectPath(input, path);
       if (expectedPathResult === false) {
@@ -47,27 +47,6 @@ var checkNested = function(input, hasNested, debug) {
   });
 
   return result;
-
-};
-
-var filterPath = function(base, path, debug) {
-
-  var filteredPath;
-  var components = path.split('.');
-  var componentsString = components[0];
-
-  components.forEach(function(component, index) {
-    if (filteredPath === undefined) {
-      if (eval(componentsString) === base) {
-        var componentsForFilteredString = components.slice(index + 1);
-        filteredPath = componentsForFilteredString.join('.');
-      } else if (components[index + 1] !== undefined) {
-        componentsString = componentsString + '.' + components[index + 1];
-      }
-    }
-  });
-
-  return filteredPath;
 
 };
 

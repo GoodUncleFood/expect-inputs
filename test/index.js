@@ -253,7 +253,7 @@ describe('expectInputs', function() {
 
   });
 
-  describe('it should check if a number input is within a range', function() {
+  describe('should check if a number input is within a range', function() {
 
     it('should handle an inclusive range', function() {
       var a = 1;
@@ -275,6 +275,185 @@ describe('expectInputs', function() {
       expect(expectInputs(b, {isWithinNonInclusiveRange: [1, 10]})).to.equal(true);
       expect(expectInputs(c, {isWithinNonInclusiveRange: [1, 10]})).to.equal(false);
       expect(expectInputs(d, {isWithinNonInclusiveRange: [1, 10]})).to.equal(false);
+    });
+
+  });
+
+  describe('should test an input against an array of permissible values', function() {
+
+    it('should return true if a single input is a permissible value, and false otherwise', function() {
+      var a = 3;
+      expect(expectInputs(a, {hasAnyOf: [1, 2, 3]})).to.equal(true);
+      expect(expectInputs(a, {hasAnyOf: [1, 2, 4]})).to.equal(false);
+    });
+
+    it('should return true if an array input has any of the permissible values, and false otherwise', function() {
+      var a = [1, 2];
+      expect(expectInputs(a, {hasAnyOf: [2, 3, 4]})).to.equal(true);
+      expect(expectInputs(a, {hasAnyOf: [3, 4, 5]})).to.equal(false);
+    });
+
+    it('should return true if an object input has any key of the permissible values, and false otherwise', function() {
+      var a = {a: 1, b: 2};
+      expect(expectInputs(a, {hasAnyOf: ['a', 'c']})).to.equal(true);
+      expect(expectInputs(a, {hasAnyOf: ['c', 'd']})).to.equal(false);
+    });
+
+  });
+
+  describe('should test an input against an array of impermissible values', function() {
+
+    it('should return true if a single input is a impermissible value, and false otherwise', function() {
+      var a = 3;
+      expect(expectInputs(a, {hasNoneOf: [1, 2]})).to.equal(true);
+      expect(expectInputs(a, {hasNoneOf: [1, 2, 3]})).to.equal(false);
+    });
+
+    it('should return true if an array input has any of the impermissible values, and false otherwise', function() {
+      var a = [1, 2];
+      expect(expectInputs(a, {hasNoneOf: [3, 4]})).to.equal(true);
+      expect(expectInputs(a, {hasNoneOf: [1, 3, 4, 5]})).to.equal(false);
+    });
+
+    it('should return true if an object input has any key of the impermissible values, and false otherwise', function() {
+      var a = {a: 1, b: 2};
+      expect(expectInputs(a, {hasNoneOf: ['c', 'd']})).to.equal(true);
+      expect(expectInputs(a, {hasNoneOf: ['a', 'd']})).to.equal(false);
+    });
+
+  });
+
+  describe('should test that an input includes all of a certain set of values', function() {
+
+    it('should return true if a single input matches the value, and false otherwise', function() {
+      var a = 1;
+      expect(expectInputs(a, {hasAllOf: [1]})).to.equal(true);
+      expect(expectInputs(a, {hasAllOf: [1, 2]})).to.equal(false);
+    });
+
+    it('should return true if an array input has all of the required values, and false otherwise', function() {
+      var a = [1, 2];
+      expect(expectInputs(a, {hasAllOf: [1, 2]})).to.equal(true);
+      expect(expectInputs(a, {hasAllOf: [1, 3, 4, 5]})).to.equal(false);
+    });
+
+    it('should return true if an object input has all the required key values, and false otherwise', function() {
+      var a = {a: 1, b: 2};
+      expect(expectInputs(a, {hasAllOf: ['a', 'b']})).to.equal(true);
+      expect(expectInputs(a, {hasAllOf: ['a', 'd']})).to.equal(false);
+    });
+
+  });
+
+  describe('should check for typed arrays', function() {
+
+    it('strings', function() {
+      var a = ['hello', 'this', 'that'];
+      var b = ['hello', 'this', 1];
+      expect(expectInputs(a, {isArrayOfType: 'string'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'string'})).to.equal(false);
+    });
+
+    it('number', function() {
+      var a = [1, 2, 3];
+      var b = ['hello', 'this', 1];
+      expect(expectInputs(a, {isArrayOfType: 'number'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'number'})).to.equal(false);
+    });
+
+    it('boolean', function() {
+      var a = [true, false, false];
+      var b = ['hello', 'this', false];
+      expect(expectInputs(a, {isArrayOfType: 'boolean'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'boolean'})).to.equal(false);
+    });
+
+    it('object', function() {
+      var a = [{}, {}, {}];
+      var b = ['hello', 'this', {}];
+      expect(expectInputs(a, {isArrayOfType: 'object'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'object'})).to.equal(false);
+    });
+
+    it('array', function() {
+      var a = [[], [], []];
+      var b = ['hello', 'this', []];
+      expect(expectInputs(a, {isArrayOfType: 'array'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'array'})).to.equal(false);
+    });
+
+    it('function', function() {
+      var a = [function() {}, function() {}, function() {}];
+      var b = ['hello', 'this', function() {}];
+      expect(expectInputs(a, {isArrayOfType: 'function'})).to.equal(true);
+      expect(expectInputs(b, {isArrayOfType: 'function'})).to.equal(false);
+    });
+
+  });
+
+  describe('should accept a custom test', function() {
+
+    it('should return true or false based on the result of the custom test passed as a function', function() {
+      var a = [3, 2, 1];
+      var b = [1, 2, 3];
+      var customTest = function(input) {
+        if (Array.isArray(input) && input[0] > input[2]) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      expect(expectInputs(a, {customFunction: customTest})).to.equal(true);
+      expect(expectInputs(b, {customFunction: customTest})).to.equal(false);
+    });
+
+  });
+
+  describe('should have special checks for arrays', function() {
+
+    it('should have a forEach itereator that checks each element in an array', function() {
+      var a = [1, 2, 3];
+      var b = ['a', 'b'];
+      expect(expectInputs(a, {isArrayOfType: 'number', forEach: {isType: 'number'}})).to.equal(true);
+      expect(expectInputs(a, {isArrayOfType: 'string', forEach: {isType: 'number'}})).to.equal(false);
+    });
+
+    it('should have an atIndex check for specific array elements', function() {
+      var a = [1, 'a', 'b'];
+      expect(expectInputs(a, {atIndex: {'0' : {isType: 'number'}}})).to.equal(true);
+      expect(expectInputs(a, {atIndex: {'0' : {isType: 'string'}}})).to.equal(false);
+      expect(expectInputs(a, {atIndex: {'1' : {isType: 'number'}}})).to.equal(false);
+      expect(expectInputs(a, {atIndex: {'1' : {isType: 'string'}}})).to.equal(true);
+    });
+
+  });
+
+  describe('should have special checks for nested objects', function() {
+
+    it('should check if a nested item exists and apply an expects test', function() {
+      var first = {
+        second: {
+          third: {
+            subOne: {
+              a: 1,
+            },
+            subTwo: {
+              a: 1,
+            },
+          },
+        },
+      };
+      expect(expectInputs(first, {hasNested: {'first.second.third.subOne.a': {isType: 'number'}}})).to.equal(true);
+      expect(expectInputs(first, {hasNested: {'first.second.third.subThree.a': {isType: 'number'}}})).to.equal(false);
+
+    });
+
+  });
+
+  describe('should handle improper inputs and provide debugging messages', function() {
+
+    it('expectInputs should return false if an improper option is passed to the options object', function() {
+      
     });
 
   });
