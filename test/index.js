@@ -453,7 +453,45 @@ describe('expectInputs', function() {
   describe('should handle improper inputs and provide debugging messages', function() {
 
     it('expectInputs should return false if an improper option is passed to the options object', function() {
-      
+      expect(expectInputs(1, {isType: 'numbah'})).to.equal(false);
+      expect(expectInputs('hello', {hasLength: 'blah'})).to.equal(false);
+      expect(expectInputs('hello', {hasLength: -1})).to.equal(false);
+      expect(expectInputs('hello', {minLength: 'blah'})).to.equal(false);
+      expect(expectInputs('hello', {minLength: -1})).to.equal(false);
+      expect(expectInputs('hello', {maxLength: 'blah'})).to.equal(false);
+      expect(expectInputs('hello', {maxLength: -1})).to.equal(false);
+      expect(expectInputs('hello', {isNull: 1})).to.equal(false);
+      expect(expectInputs('hello', {isUndefined: 1})).to.equal(false);
+      expect(expectInputs('hello', {isTruthy: 1})).to.equal(false);
+      expect(expectInputs('hello', {isFalsy: 1})).to.equal(false);
+      expect(expectInputs('hello', {isWithinRange: 1})).to.equal(false);
+      expect(expectInputs(1, {isWithinRange: 1})).to.equal(false);
+      expect(expectInputs('hello', {isWithinNonInclusiveRange: 1})).to.equal(false);
+      expect(expectInputs(1, {isWithinNonInclusiveRange: 1})).to.equal(false);
+      expect(expectInputs(1, {hasAnyOf: 1})).to.equal(false);
+      expect(expectInputs(1, {hasNoneOf: 1})).to.equal(false);
+      expect(expectInputs(1, {hasAllOf: 1})).to.equal(false);
+    });
+
+    it('expectInputs should log specific errors if the optional debug argument is set tot true', function() {
+      expect(expectInputs(1, {isType: 'numbah'}, true)).to.equal(false);
+      expect(expectInputs('hello', {hasLength: 'blah'}, true)).to.equal(false);
+      expect(expectInputs('hello', {hasLength: -1}, true)).to.equal(false);
+      expect(expectInputs('hello', {minLength: 'blah'}, true)).to.equal(false);
+      expect(expectInputs('hello', {minLength: -1}, true)).to.equal(false);
+      expect(expectInputs('hello', {maxLength: 'blah'}, true)).to.equal(false);
+      expect(expectInputs('hello', {maxLength: -1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isNull: 1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isUndefined: 1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isTruthy: 1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isFalsy: 1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isWithinRange: 1}, true)).to.equal(false);
+      expect(expectInputs(1, {isWithinRange: 1}, true)).to.equal(false);
+      expect(expectInputs('hello', {isWithinNonInclusiveRange: 1}, true)).to.equal(false);
+      expect(expectInputs(1, {isWithinNonInclusiveRange: 1}, true)).to.equal(false);
+      expect(expectInputs(1, {hasAnyOf: 1}, true)).to.equal(false);
+      expect(expectInputs(1, {hasNoneOf: 1}, true)).to.equal(false);
+      expect(expectInputs(1, {hasAllOf: 1}, true)).to.equal(false);
     });
 
   });
