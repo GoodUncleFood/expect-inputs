@@ -260,10 +260,14 @@ describe('expectInputs', function() {
       var b = 5;
       var c = 10;
       var d = 11;
+      var lat = 170.6;
+      var long = -170.5;
       expect(expectInputs(a, {isWithinRange: [1, 10]})).to.equal(true);
       expect(expectInputs(b, {isWithinRange: [1, 10]})).to.equal(true);
       expect(expectInputs(c, {isWithinRange: [1, 10]})).to.equal(true);
       expect(expectInputs(d, {isWithinRange: [1, 10]})).to.equal(false);
+      expect(expectInputs(lat, {isWithinRange: [-180, 180]})).to.equal(true);
+      expect(expectInputs(long, {isWithinRange: [-180, 180]})).to.equal(true);
     });
 
     it('should handle a non-inclusive range', function() {
