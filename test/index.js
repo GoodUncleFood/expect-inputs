@@ -495,7 +495,7 @@ describe('expectInputs', function() {
       expect(expectInputs({}, {hasNested: 1})).to.equal(false);
     });
 
-    it('expectInputs should log specific errors if the optional debug argument is set tot true', function() {
+    it('expectInputs should log specific errors if the optional debug argument is set to true', function() {
       expect(expectInputs(1, {isType: 'numbah'}, true)).to.equal(false);
       expect(expectInputs('hello', {hasLength: 'blah'}, true)).to.equal(false);
       expect(expectInputs('hello', {hasLength: -1}, true)).to.equal(false);

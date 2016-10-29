@@ -249,11 +249,3 @@ module.exports = expectInputs = function(input, expects, debug) {
   return result;
 
 };
-
-var one = {
-  two: {
-    a: false
-  },
-};
-
-console.log(expectInputs(one, {hasNested: {'one.two.a': {isType: 'boolean'}}}));
