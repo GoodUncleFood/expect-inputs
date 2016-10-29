@@ -37,7 +37,7 @@ var checkNested = function(input, hasNested, debug) {
       var path = key.split('.').slice(1).join('.');
 
       var expectedPathResult = expectPath(input, path);
-      if (expectedPathResult === false) {
+      if (expectedPathResult === 'not found') {
         result = false;
       } if (!checkInputs(expectedPathResult, hasNested[key], debug)) {
         result =  false;
@@ -68,7 +68,7 @@ var expectPath = function(base, path, debug) {
   });
 
   if (result === false) {
-    return result;
+    return 'not found';
   } else {
     return current;
   }
@@ -249,3 +249,11 @@ module.exports = expectInputs = function(input, expects, debug) {
   return result;
 
 };
+
+var one = {
+  two: {
+    a: false
+  },
+};
+
+console.log(expectInputs(one, {hasNested: {'one.two.a': {isType: 'boolean'}}}));

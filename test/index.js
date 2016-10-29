@@ -456,12 +456,13 @@ describe('expectInputs', function() {
               a: 1,
             },
             subTwo: {
-              a: 1,
+              a: false,
             },
           },
         },
       };
       expect(expectInputs(first, {hasNested: {'first.second.third.subOne.a': {isType: 'number'}}})).to.equal(true);
+      expect(expectInputs(first, {hasNested: {'first.second.third.subTwo.a': {isType: 'boolean'}}})).to.equal(true);
       expect(expectInputs(first, {hasNested: {'first.second.third.subThree.a': {isType: 'number'}}})).to.equal(false);
 
     });
