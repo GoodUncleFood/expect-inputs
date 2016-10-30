@@ -37,7 +37,8 @@ var checkNested = function(input, hasNested, debug) {
   // gets the keys/paths of each object to check, as specified by the caller in the hasNested object
   var keys = Object.keys(hasNested);
 
-  // iterates through the keys to determine 1) if the object exists as a sub-object of the input object and 2) applies the expects checks to the sub-object
+  // iterates through the keys to determine 1) if the object exists as a sub-object of the input object
+  // and 2) applies the expects checks to the sub-object
   keys.forEach(function(key) {
     if (result) {
 
@@ -277,7 +278,7 @@ module.exports = expectInputs = function(input, expects, debug) {
 
     }
 
-  // if input is not an array,
+  // if input is not an array, applies the tests specified in expects to the individual value 
   } else {
     if (!checkInputs(input, expects, debug)) {
       result = false;
