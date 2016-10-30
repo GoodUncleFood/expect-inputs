@@ -1,32 +1,151 @@
 # Expect Inputs
 
-```
-isType : 'object', 'array', 'function, 'string', 'number', 'boolean'
-hasLength : true, false, number
-minLength : number > 0
-maxLength : number > 0
-isExactly: Object, Array, Function, String, Number, Boolean
-isNull : true, false
-isUndefined : true, false
-isTruthy : true, false
-isFalsy: true, false
-isWithinRange: [ min Number, max Number ]
-isWithinNonInclusiveRange: [ min Number, max Number ]
-hasAnyOf: [], checks if key is present if test item is an object
-hasNoneOf: [], checks if key is present if test item is an object
-hasAllOf: [], checks if key is present if test item is an object
-hasOnly: [], checks if key is present if test item is an object
-isArrayOfType: 'object', 'array', 'function, 'string', 'number', 'boolean'
-forEach: { path (string) : expects options (obj) }
-atIndex: { path (string) : expects options (obj) }
-hasNested: { path (string) : expects options (obj) }
-customFunction: () => {} expects if function returns true
-```
-### Test Coverage Summary
+A helper library for JavaScript developers to sanity check expected values.
+
+## Install
 
 ```
-Statements   : 97.89% ( 324/331 )
-Branches     : 96.94% ( 380/392 )
-Functions    : 100% ( 30/30 )
-Lines        : 97.89% ( 324/331 )
+npm install expect-inputs
+```
+
+## Basic Usage
+
+```
+expectInputs(inputs, expects, debug); // returns true or false
+```
+`inputs` accepts a String, Number, Boolean, Array, Object, or Function
+
+`expects` accepts an object with any of the options as specified below
+
+`debug` is an optional argument that will provide basic error logging if true
+
+## Sample Usage
+
+### Testing a single input
+
+```
+var a = 'hello';
+expectInputs(a, {isType: 'string', hasLength: 5}); // true
+```
+
+### Testing elements in an array
+
+```
+var inputs = [1, 'string,', true];
+var expects = [
+  {
+    isUndefined: false,
+    isType: 'number',
+  },
+  {
+    isType: 'string',
+    minLength: 3,
+  },
+  {
+    isNull: false,
+    isType: 'boolean',
+  },
+];
+expectInputs(inputs, expects); // true
+```
+
+### Testing an array and each of its elements using the forEach option
+
+```
+var inputs = ['Bob', 'Carol', 'Ted', 'Alice'];
+var expects = {
+  isType: 'array',
+  hasLength: true,
+  forEach: {
+    isType: 'string',
+    hasLength: true,
+  },
+};
+expectInputs(inputs, expects); // true
+```
+
+### Testing an array and individual elements using the atIndex option
+
+```
+var inputs = ['hello', 1];
+var expects = {
+  isType: 'array',
+  hasLength: true,
+  atIndex: {
+    '0': {
+      isType: 'string',
+    },
+    '1': {
+      isType: 'number',
+    },
+  },
+};
+expectInputs(inputs, expects); // true
+```
+
+### Testing a nested object
+
+```
+var input = {
+  subOne: {
+    a: 1,
+  },
+};
+var expects = {
+  isType: 'object',
+  hasNested: {
+    'input.subOne.a': {
+      isUndefined: false,
+      isType: 'number',
+    },
+  },
+};
+expectInputs(input, expects): // true
+```
+
+### Testing an input using the customFunction option
+
+```
+var inputs = [1, 2, 3];
+var customTest = function(input) {
+  if (Array.isArray(input) && input[0] > input[2]) {
+    return true;
+  } else {
+    return false;
+  }
+};
+expectInputs(inputs, {customFunction: customTest}); // false
+```
+
+## Options
+
+```
+isType : String ('object', 'array', 'function, 'string', 'number', 'boolean')
+hasLength : Boolean or Number
+minLength : Number > 0
+maxLength : Number > 0
+isExactly : Object, Array, Function, String, Number, Boolean
+isNull : Boolean
+isUndefined : Boolean
+isTruthy : Boolean
+isFalsy : Boolean
+isWithinRange : [ min Number, max Number ]
+isWithinNonInclusiveRange : [ min Number, max Number ]
+hasAnyOf : [], if test item is an Object, test if it contains key
+hasNoneOf : [], if test item is an Object, test if it contains key
+hasAllOf : [], if test item is an Object, test if it contains key
+isArrayOfType : String ('object', 'array', 'function, 'string', 'number', 'boolean')
+forEach : { path String : expects options Object }
+atIndex : { path String : expects options Object }
+hasNested : { path String : expects options Object }
+customFunction : Function
+```
+
+## Test Coverage Summary
+
+```
+Statements   :   97.89% ( 324/331 )
+Branches     :   96.94% ( 380/392 )
+Functions    :   100% ( 30/30 )
+Lines        :   97.89% ( 324/331 )
 ```

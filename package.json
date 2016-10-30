@@ -1,6 +1,6 @@
 {
   "name": "expect-inputs",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A helper library to sanity check function inputs.",
   "author": "Donald Steinert <steinert.donald@gmail.com> (https://dnld.cc)",
   "license": "MIT",
