@@ -1,4 +1,4 @@
-// loads helper functions from lib
+// loads helper modules from lib
 var expectType = require('./lib/expectType');
 var expectLength = require('./lib/expectLength');
 var expectExactly = require('./lib/expectExactly');
@@ -278,7 +278,7 @@ module.exports = expectInputs = function(input, expects, debug) {
 
     }
 
-  // if input is not an array, applies the tests specified in expects to the individual value 
+  // if input is not an array, applies the tests specified in expects to the individual value
   } else {
     if (!checkInputs(input, expects, debug)) {
       result = false;

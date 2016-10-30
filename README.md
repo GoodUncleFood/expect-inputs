@@ -22,3 +22,11 @@ atIndex: { path (string) : expects options (obj) }
 hasNested: { path (string) : expects options (obj) }
 customFunction: () => {} expects if function returns true
 ```
+### Test Coverage Summary
+
+```
+Statements   : 97.89% ( 324/331 )
+Branches     : 96.94% ( 380/392 )
+Functions    : 100% ( 30/30 )
+Lines        : 97.89% ( 324/331 )
+```
