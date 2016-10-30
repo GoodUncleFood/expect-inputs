@@ -1,14 +1,23 @@
 # Expect Inputs
 
-A helper library for JavaScript developers to sanity check expected values.
+A JavaScript library that provides lightweight, flexible checking of function argument.
 
-## Install
+Expect Inputs is developed and maintained by [Good Uncle](http://gooduncle.com).
+
+## Basic Usage
+
+### Install
 
 ```
 npm install expect-inputs
 ```
+### Require module
 
-## Basic Usage
+```
+var expectInputs = require('expect-inputs');
+```
+
+### Basic Syntax
 
 ```
 expectInputs(inputs, expects, debug); // returns true or false
@@ -18,6 +27,20 @@ expectInputs(inputs, expects, debug); // returns true or false
 `expects` accepts an object with any of the options as specified below
 
 `debug` is an optional argument that will provide basic error logging if true
+
+### Test Inputs
+
+```
+var expectInputs = require('expect-inputs');
+var timesTwo = function(input) {
+  if (expectInputs(input, {isUndefined: false, isType: 'number'})) {
+    return input * 2;
+  } else {
+    console.log('invalid input');
+    return;
+  }
+};
+```
 
 ## Sample Usage
 
