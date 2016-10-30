@@ -493,6 +493,7 @@ describe('expectInputs', function() {
       expect(expectInputs(1, {customFunction: 1})).to.equal(false);
       expect(expectInputs(1, {hasNested: {}})).to.equal(false);
       expect(expectInputs({}, {hasNested: 1})).to.equal(false);
+      expect(expectInputs(['1', '2'], {isArrayOfType: '1'})).to.equal(false);
     });
 
     it('expectInputs should log specific errors if the optional debug argument is set to true', function() {
@@ -517,6 +518,7 @@ describe('expectInputs', function() {
       expect(expectInputs(1, {customFunction: function(i) {return i === 2;}}, true)).to.equal(false);
       expect(expectInputs(1, {hasNested: {}}, true)).to.equal(false);
       expect(expectInputs({}, {hasNested: 1}, true)).to.equal(false);
+      expect(expectInputs(['1', '2'], {isArrayOfType: '1'}, true)).to.equal(false);
     });
 
   });
