@@ -1,6 +1,6 @@
 # Expect Inputs
 
-A JavaScript library that provides lightweight, flexible checking of function argument2.
+A JavaScript library that provides lightweight, flexible checking of function arguments.
 
 Expect Inputs is developed and maintained by [Good Uncle](http://gooduncle.com).
 
